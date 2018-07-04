@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>五子棋</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        <script src="js/mui.min.js"></script>
+        <link href="css/mui.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" type="text/css" href="css/game.css"/>
+        <script type="text/javascript" charset="utf-8">
+            mui.init();
+        </script>
+        <script type="text/javascript" src="js/game.js"></script>
+    </head>
+    <body>
+        <div id="game">
+            <img id="board" src="images/board.png" alt="board">
+        </div>
+        <span>起始x坐标：</span>
+        <span id="stx">undefined</span>
+        <br />
+        <span>起始y坐标：</span>
+        <span id="sty">undefined</span>
+        <br />
+        <span>当前x坐标：</span>
+        <span id="x">undefined</span>
+        <br />
+        <span>当前y坐标：</span>
+        <span id="y">undefined</span>
+        <br />
+        <span>结束x坐标：</span>
+        <span id="endx">undefined</span>
+        <br />
+        <span>结束y坐标：</span>
+        <span id="endy">undefined</span>
+        <br />
+        <button id='btn2' onclick="addPieces('B', 5, 5)">落黑子</button>
+    </body>
+</html>
