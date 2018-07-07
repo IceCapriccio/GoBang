@@ -1,12 +1,12 @@
 {
-	"index.html": {
-		"refer": [
-			"game.html"
-		]
-	},
-	"game.html": {
-		"refer": [
-			"index.html"
-		]
-	}
+  "index.html": {
+    "refer": [
+      "game.html"
+    ]
+  },
+  "game.html": {
+    "refer": [
+      "index.html"
+    ]
+  }
 }

@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <title>五子棋</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <script src="js/mui.min.js"></script>
         <link href="css/mui.min.css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="css/game.css"/>
@@ -16,26 +16,26 @@
         <div id="game">
             <img id="board" src="images/board.png" alt="board">
         </div>
-        <span>起始x坐标：</span>
-        <span id="stx">undefined</span>
+        <span class="debug">起始x坐标：</span>
+        <span id="stx" class="debug">undefined</span>
         <br />
-        <span>起始y坐标：</span>
-        <span id="sty">undefined</span>
+        <span class="debug">起始y坐标：</span>
+        <span id="sty" class="debug">undefined</span>
         <br />
-        <span>当前x坐标：</span>
-        <span id="x">undefined</span>
+        <span class="debug">当前x坐标：</span>
+        <span id="x" class="debug">undefined</span>
         <br />
-        <span>当前y坐标：</span>
-        <span id="y">undefined</span>
+        <span class="debug">当前y坐标：</span>
+        <span id="y" class="debug">undefined</span>
         <br />
-        <span>结束x坐标：</span>
-        <span id="endx">undefined</span>
+        <span class="debug">结束x坐标：</span>
+        <span id="endx" class="debug">undefined</span>
         <br />
-        <span>结束y坐标：</span>
-        <span id="endy">undefined</span>
+        <span class="debug">结束y坐标：</span>
+        <span id="endy" class="debug">undefined</span>
         <br />
-        <span>判断结果：</span>
-        <span id="result">undefined</span>
-        <button id='btn2' onclick="">落黑子</button>
+        <span class="debug">判断结果：</span>
+        <span id="result" class="debug">undefined</span>
+        <button id='btn2' class="mui-btn mui-btn-primary" onclick="game.restart()">重新开始</button>
     </body>
 </html>

@@ -5,3 +5,8 @@
 body {
 	font-size: 12px;
 }
+
+#btn2 {
+    width: 25vw;
+    height: 10vw;
+}

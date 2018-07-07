@@ -1,10 +1,12 @@
-// 用来标志一次拖拽时间的起始坐标、中间拖拽坐标、拖拽离开坐标
+debugMode = 1;
+
+// 用来标志一次拖拽时间的起始坐标、中间拖拽坐标、最后一次有效的（能落子）坐标
 stX = -1;
 stY = -1;
 curX = -1;
 curY = -1;
-endX = -1;
-endY = -1;
+lastValidX = -1;
+lastValidY = -1;
 // 方向数组
 dirx = [0, -1, -1, -1];
 diry = [-1, 1, 0, -1];
@@ -14,6 +16,23 @@ blankX = 0.04;
 blankY = 0.015;
 column = 0.0644;
 row = 0.0637;
+
+// 调试 bug 用
+function showBoard(board) {
+    s = ''
+    for (var i = 0; i < 15; i++) {
+        for (var j = 0; j < 15; j++) {
+            if (board[j][i] == -1)
+                s += '*';
+            else if (board[j][i] == 0)
+                s += 'W';
+            else if (board[j][i]  == 1)
+                s += 'B';
+        }
+        s += '\n';
+    }
+    console.log(s);
+}
 
 /*  落子函数
 * :x: 棋子在棋盘中从上数第几行 (0 <= x <= 14)
@@ -59,6 +78,8 @@ function touchstart(e){
     var coordinate = convert(stX, stY);
     if (game.get(coordinate) !== -1)
         return;
+    lastValidX = stX;
+    lastValidY = stY;
     img = addPieces('B', coordinate, 0.5);
 }
 function touchmove(e) {
@@ -68,8 +89,11 @@ function touchmove(e) {
     curY = e.changedTouches[0].pageY - 50;
     var coordinate = convert(curX, curY);
     if (img.coordinate !== coordinate && game.get(coordinate) === -1) {
+        lastValidX = curX;
+        lastValidY = curY;
         img.coordinate = coordinate;
-        document.getElementById('game').removeChild(document.getElementById('tmp'));
+        if (document.getElementById('tmp'))
+            document.getElementById('game').removeChild(document.getElementById('tmp'));
         addPieces('B', img.coordinate, 0.5);
     }
 }
@@ -77,24 +101,29 @@ function touchend(e) {
     endx.innerHTML = e.changedTouches[0].pageX;
     endy.innerHTML = e.changedTouches[0].pageY;
     endX = e.changedTouches[0].pageX;
-    endY = e.changedTouches[0].pageY - 50;
+    endY = e.changedTouches[0].pageY - 70;
     var tmp = document.getElementById('tmp');
-    if (tmp == null)
+    if (tmp == null) {
+        console.log('没有找到 #tmp');
         return;
+    }
     tmp.style.opacity = 1;
     tmp.id = '';
     tmp.className = 'piece';
 
-    var coordinate = convert(endX, endY);
-    if (game.get(coordinate) != -1)
+    var coordinate = convert(lastValidX, lastValidY);
+    if (game.get(coordinate) != -1) {
+        console.log('所移动位置有棋子');
         return;
+    }
     game.board[coordinate[0]][coordinate[1]] = 1;
     var result = game.judge(); // 下完子判断是否连成 5 子
     var dic = ['not end', 'AI', 'Player'];
     document.getElementById('result').innerHTML = dic[result + 1];
     if (result !== -1) {
+        console.log('游戏结束');
         game.winner = result;
-        game.gameover();
+        game.gameover(1);
         return; // 分出胜负则退出游戏
     }
     game.curPlayer = 'W';
@@ -121,7 +150,6 @@ function Game() {
 
     // 获取一个坐标上落子的情况
     this.get = function (coordinate) {
-        // console.log('coordinate:', coordinate, 'value:', this.board[coordinate[0]][coordinate[1]]);
         return this.board[coordinate[0]][coordinate[1]];
     }
 
@@ -134,7 +162,6 @@ function Game() {
         // 清除 UI 上的所有棋子
         var pieces = document.getElementsByClassName('piece');
         var gameDiv = document.getElementById('game');
-        console.log(pieces);
         for (i = pieces.length - 1; i >= 0; i--) {
             gameDiv.removeChild(pieces[i]);
         }
@@ -158,17 +185,20 @@ function Game() {
         // 由 Robot 类计算出当前棋盘状况最优的落子点及获得的分数
         var info = this.robot.play(this.board);
         var x = info[0], y = info[1], score = info[2];
-        console.log(x, y);
         addPieces(this.curPlayer, [x, y], 1);
         this.board[x][y] = 0;
         this.curPlayer = 'B';
         this.last = [x, y];
+
+        console.log('第' + ccc++ + '次落子');
+        showBoard(this.board);
+
         var result = this.judge();
         var dic = ['not end', 'AI', 'Player'];
         document.getElementById('result').innerHTML = dic[result + 1];
         if (result !== -1) {
             this.winner = result;
-            this.gameover();
+            this.gameover(0);
         }
     }
 
@@ -196,13 +226,25 @@ function Game() {
         return -1;
     }
 
-    this.gameover = function () {
-        this.clear();
+    this.gameover = function (winner) {
+        if (winner == 1)
+            mui.alert('恭喜你打败了我的 贝塔Go~！');
+        else
+            mui.alert('输了吧小辣鸡~');
         window.removeEventListener('touchstart', touchstart);
         window.removeEventListener('touchmove', touchmove);
         window.removeEventListener('touchend', touchend);
     }
+
+    this.restart = function () {
+        game.clear();
+        window.addEventListener('touchstart', touchstart);
+        window.addEventListener('touchmove', touchmove);
+        window.addEventListener('touchend', touchend);
+    }
 }
+
+ccc = 0;
 
 // AI 类
 function Robot() {
@@ -255,8 +297,6 @@ function Robot() {
                     }
                     if (player[cnt] && AI[cnt])
                         player[cnt] = AI[cnt] = 0;
-                    else if (AI[cnt] || player[cnt])
-                        console.log('the ' + cnt + 'th method, AI: ', AI[cnt], 'player:', player[cnt], 'coordinate: ', i, j);
                     cnt++;
                 }
             }
@@ -306,9 +346,6 @@ function Robot() {
                 }
             }
         }
-        console.log('score:', score);
-        console.log('AI:', AI);
-        console.log('player:', player);
         var maxScore = -1, x = -1, y = -1;
         for (i = 0; i < 15; i++)
             for (j = 0; j < 15; j++)
@@ -327,5 +364,11 @@ window.onload = function() {
 	game = new Game();
     imageW = document.getElementById('board').width;
     imageH = document.getElementById('board').height;
+    if (!debugMode) {
+        var debugDOMs = document.getElementsByClassName('debug');
+        for (var i = 0; i < debugDOMs.length; i++) {
+            debugDOMs[i].style.visibility = 'hidden';
+        }
+    }
 }
 
